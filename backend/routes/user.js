@@ -78,7 +78,7 @@ router.post("/LOGIN", (req, res, next) => {
           //Valid Case generate token
           const token = jwt.sign(
             { gmail: user.gmail, userId: user._id },
-            "raghav_garg_first_mean_project_this_can_be_anything",
+            process.env.JWT_KEY,
             { expiresIn: '1h' } // 1 hour
           );
           res.status(200).json({

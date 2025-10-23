@@ -1,5 +1,7 @@
 // console.log("hello"); //hello world
 
+// Load environment variables from the correct path
+require('dotenv').config({ path: __dirname + '/.env' });
 
 // we have install nodemon to automatic start the server on save just like in anguar
 
