@@ -129,7 +129,7 @@ export class BusinessDataService {
   onLinkedin(){
     const link=document.createElement('a');
     link.target="_blank";
-    link.href="https://www.linkedin.com/in/raghavgarg2002/";
+    link.href="https://www.linkedin.com/in/manish-kalwani-896529298/";
     link.click();
   }
   

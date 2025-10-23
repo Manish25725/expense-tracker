@@ -1,5 +1,4 @@
-[![Linkedin Badge](https://img.shields.io/badge/Raghav-follow%20on%20linkedin-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/raghavgarg2002/)
-![Instagram Badge](https://img.shields.io/badge/grraghav120@gmail.com-follow%20on%20Gmail-blue?style=for-the-badge&logo=gmail)
+[![Linkedin Badge](https://img.shields.io/badge/Manish%20Kalwani-follow%20on%20linkedin-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/manish-kalwani-896529298/)
 
 ## Celebrating 300+ Active Users on Expense Tracker 🥳🎉🍾
 
@@ -24,7 +23,14 @@
    <img src="https://img.shields.io/github/issues-pr-closed-raw/grraghav120/expense-tracker?style=for-the-badge" />
    <img src="https://img.shields.io/github/forks/grraghav120/expense-tracker?style=for-the-badge" />
   <img src="https://img.shields.io/github/last-commit/grraghav120/expense-tracker?style=for-the-badge" />
-</div>  
+</div>
+
+# About the Developer
+
+**Manish Kalwani** - Full Stack Developer  
+📧 Connect with me on [LinkedIn](https://www.linkedin.com/in/manish-kalwani-896529298/)
+
+---  
 
 # Quick Acces 😏
 
