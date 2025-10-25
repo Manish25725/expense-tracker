@@ -14,22 +14,21 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(express.static("public"))
 app.use(cookieParser())
 
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - Body:`, req.body);
+    next();
+})
+
 // Routes import
 import userRouter from './routes/user.routes.js'
 import expenseRouter from './routes/expense.routes.js'
+import healthRouter from './routes/health.routes.js'
 
-// Routes declaration
+//routes declaration
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/expenses", expenseRouter)
-
-// Health check route
-app.get("/api/v1/health", (req, res) => {
-    res.status(200).json({
-        status: "OK",
-        message: "Server is running",
-        timestamp: new Date().toISOString()
-    })
-})
+app.use("/api/v1/health", healthRouter)
 
 // 404 handler
 app.use("*", (req, res) => {

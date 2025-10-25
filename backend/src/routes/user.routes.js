@@ -7,7 +7,8 @@ import {
     getCurrentUser,
     deleteAccount,
     getAppVersion,
-    updateUserCategories
+    updateUserCategories,
+    updateUserProfile
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -24,5 +25,6 @@ router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/current-user").get(verifyJWT, getCurrentUser)
 router.route("/delete-account").delete(verifyJWT, deleteAccount)
 router.route("/update-categories").patch(verifyJWT, updateUserCategories)
+router.route("/update-profile").patch(verifyJWT, updateUserProfile)
 
 export default router

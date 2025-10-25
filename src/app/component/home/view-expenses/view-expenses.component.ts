@@ -151,15 +151,18 @@ export class ViewExpensesComponent implements OnInit {
   //bar charts logic
 
   onBarChartEdit(data:any){
+    console.log("Bar chart data input:", data);
     let hashmap:any={};
     for(let i=0;i<data.length;i++){
       let date=data[i].expense_date.toString().split(' ');
+      console.log("Processing date:", data[i].expense_date, "Split:", date);
       hashmap[date[3]]=[];
     }
     for(let i=0;i<data.length;i++){
       let date=data[i].expense_date.toString().split(' ');
       hashmap[date[3]].push([date[1],data[i].amount]);
     }
+    console.log("Generated hashmap:", hashmap);
     this.businessData.hashmap=hashmap;
   }
 

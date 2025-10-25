@@ -39,6 +39,16 @@ export class BusinessDataService {
     return sessionStorage.getItem('Id')?.split(' ')[1];
   }
 
+  getHttpHeaders() {
+    const token = sessionStorage.getItem('LEAD_ID') || localStorage.getItem('LEAD_ID');
+    return {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    };
+  }
+
   onHome(){
     this.route.navigate(['home']);
   }
@@ -48,82 +58,73 @@ export class BusinessDataService {
 
   onGetAllExpense(id:any) {
     this.userId=id;
-    return this.http.get(this.apiUrl + 'GET_ALL_EXPENSE/'+id);
+    return this.http.get(this.apiUrl + 'api/v1/expenses', this.getHttpHeaders());
   }
 
   onCreateExpense(values: any,date:any) {
-    let id=sessionStorage.getItem('Id')?.split(' ')[1];
     let body={
       name: values.name,
       amount: values.amount,
-      expense_date: (date[0]+' '+date[1]+' '+date[2]+' '+date[3]),
-      expense_category: values.expense_category,
-      payment: values.payment,
+      expenseDate: new Date(date[0]+' '+date[1]+' '+date[2]+' '+date[3]),
+      category: values.expense_category,
+      paymentType: values.payment,
       comment: values.comment,
-      creater:id,
     }
-    return this.http.post(this.apiUrl + 'CREATE_EXPENSE', body);
+    return this.http.post(this.apiUrl + 'api/v1/expenses', body, this.getHttpHeaders());
   }
 
 
   onImportExpense(values:any){
-    let id=this.getUserIdFromSS();
     let date=values.expense_date.split('/');
-    date=(new Date(date[2],date[1]-1,date[0])).toString();
-    date=date.split(' ');
+    date=(new Date(date[2],date[1]-1,date[0]));
     let body={
       name: values.expense_name,
       amount: values.amount,
-      expense_date: (date[0]+' '+date[1]+' '+date[2]+' '+date[3]),
-      expense_category: values.expense_category,
-      payment: values.payment_type,
+      expenseDate: date,
+      category: values.expense_category,
+      paymentType: values.payment_type,
       comment: values.comment,
-      creater:id,
     }
-    return this.http.post(this.apiUrl+'CREATE_EXPENSE',body);
+    return this.http.post(this.apiUrl+'api/v1/expenses/import',{expenses: [body]}, this.getHttpHeaders());
   }
 
 
   onCreateCategory(body:any){
-    return this.http.post(this.apiUrl+'SAVE_CATEGORY/'+this.userId,body);
+    return this.http.patch(this.apiUrl+'api/v1/users/update-categories',{categories: body}, this.getHttpHeaders());
   }
 
   onEditCategory(body:any){
-    return this.http.post(this.apiUrl+'EDIT_CATEGORY/'+this.userId,body);
+    return this.http.patch(this.apiUrl+'api/v1/users/update-categories',{categories: body}, this.getHttpHeaders());
   }
   
   onDeleteExpense(id:string){
-    return this.http.delete(this.apiUrl+'DELETE_EXPENSE/'+this.userId+'/'+id);
+    return this.http.delete(this.apiUrl+'api/v1/expenses/'+id, this.getHttpHeaders());
   }
 
   onGetSingleExpense(id:string){
-    return this.http.get(this.apiUrl+'GET_SINGLE_EXPENSE/'+this.userId+'/'+id);
+    return this.http.get(this.apiUrl+'api/v1/expenses/'+id, this.getHttpHeaders());
   }
 
   onUpdateExpense(id:string,values:any){
-    let str=values.expense_date.toString();
-    let date=str.split(' ');
     let body={
       name: values.name,
       amount: values.amount,
-      expense_date: (date[0]+' '+date[1]+' '+date[2]+' '+date[3]),
-      expense_category: values.expense_category,
-      payment: values.payment,
+      expenseDate: new Date(values.expense_date),
+      category: values.expense_category,
+      paymentType: values.payment,
       comment: values.comment,
-      creater:this.userId,
     }
-    return this.http.patch(this.apiUrl+'UPDATE_EXPENSE/'+this.userId+'/'+id,body);
+    return this.http.patch(this.apiUrl+'api/v1/expenses/'+id,body, this.getHttpHeaders());
   }
 
   onGetAllCategory(){
-    this.userId=sessionStorage.getItem('Id')?.split(' ')[1];
-    return this.http.get(this.apiUrl+'GET_CATEGORY/'+this.userId);
+    return this.http.get(this.apiUrl+'api/v1/users/current-user', this.getHttpHeaders());
   }
   
   onGithub(){
     const link=document.createElement('a');
     link.target="_blank";
-    link.href="https://github.com/grraghav120";
+    link.href="https://github.com/Manish25725";
     link.click();
   }
   onLinkedin(){
@@ -134,15 +135,23 @@ export class BusinessDataService {
   }
   
   updateProfile(body:any){
-    return this.http.post(this.apiUrl+'UPDATE_PROFILE/'+this.getUserIdFromSS(),body);
+    return this.http.patch(this.apiUrl+'api/v1/users/update-profile', body, this.getHttpHeaders());
   }
 
   updateWholeInfo(body:any){
-    return this.http.post(this.apiUrl+'UPDATE_NAME/'+this.getUserIdFromSS(),body);
+    return this.http.patch(this.apiUrl+'api/v1/users/update-profile', body, this.getHttpHeaders());
   }
 
   getAllSaveData(){
-    return this.http.get(this.apiUrl+'GET_SAVE_DATA/'+this.getUserIdFromSS());
+    return this.http.get(this.apiUrl+'api/v1/users/current-user', this.getHttpHeaders());
+  }
+
+  getDashboardExpenses(timeFilter: string = 'all') {
+    let url = this.apiUrl + 'api/v1/expenses/dashboard';
+    if (timeFilter !== 'all') {
+      url += `?timeFilter=${timeFilter}`;
+    }
+    return this.http.get(url, this.getHttpHeaders());
   }
 
 }

@@ -131,7 +131,7 @@ export class ImportComponent implements OnInit {
     this.businessData
       .onImportExpense(body)
       .subscribe((res: any) => {
-        if (res.status === true) {
+        if (res.success === true || res.statusCode === 200 || res.statusCode === 201) {
           // Expense added successfully
         }
       },error=>{

@@ -20,17 +20,23 @@ const generateAccessAndRefreshTokens = async(userId) => {
 }
 
 const registerUser = asyncHandler(async (req, res) => {
+    console.log("Registration request received:", req.body);
+    
     const { name, username, email, password, categories } = req.body
 
     if ([name, username, email, password].some((field) => field?.trim() === "")) {
+        console.log("Validation failed: Missing required fields");
         throw new ApiError(400, "All fields are required")
     }
 
+    console.log("Checking for existing user with email:", email, "or username:", username);
+    
     const existedUser = await User.findOne({
         $or: [{ username }, { email }]
     })
 
     if (existedUser) {
+        console.log("User already exists:", existedUser.email);
         throw new ApiError(409, "User with email or username already exists")
     }
 
@@ -74,23 +80,32 @@ const registerUser = asyncHandler(async (req, res) => {
 })
 
 const loginUser = asyncHandler(async (req, res) => {
+    console.log("Login request received:", req.body);
+    
     const { email, username, password } = req.body
 
     if (!username && !email) {
+        console.log("Validation failed: No username or email provided");
         throw new ApiError(400, "username or email is required")
     }
 
+    console.log("Looking for user with email:", email, "or username:", username);
+    
     const user = await User.findOne({
         $or: [{ username }, { email }]
     })
 
     if (!user) {
+        console.log("User not found");
         throw new ApiError(404, "User does not exist")
     }
 
+    console.log("User found, checking password");
+    
     const isPasswordValid = await user.isPasswordCorrect(password)
 
     if (!isPasswordValid) {
+        console.log("Invalid password");
         throw new ApiError(401, "Invalid user credentials")
     }
 
@@ -258,6 +273,36 @@ const updateUserCategories = asyncHandler(async(req, res) => {
         .json(new ApiResponse(200, user, "Categories updated successfully"))
 })
 
+const updateUserProfile = asyncHandler(async(req, res) => {
+    const { name, username } = req.body
+
+    // Check if username is already taken by another user
+    if (username) {
+        const existingUser = await User.findOne({
+            username: username.toLowerCase(),
+            _id: { $ne: req.user._id }
+        })
+
+        if (existingUser) {
+            throw new ApiError(409, "Username is already taken")
+        }
+    }
+
+    const updateFields = {}
+    if (name) updateFields.name = name
+    if (username) updateFields.username = username.toLowerCase()
+
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        { $set: updateFields },
+        { new: true }
+    ).select("-password -refreshToken")
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, "Profile updated successfully"))
+})
+
 export {
     registerUser,
     loginUser,
@@ -266,5 +311,6 @@ export {
     getCurrentUser,
     deleteAccount,
     getAppVersion,
-    updateUserCategories
+    updateUserCategories,
+    updateUserProfile
 }

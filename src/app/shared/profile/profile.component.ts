@@ -37,11 +37,11 @@ export class ProfileComponent implements OnInit{
           this.editable=false;
         }
       }, 1000);
-      let firstDate=(res.data.firstLoginDate).toString().split('T')[0];
+      let firstDate=(res.data.userFirstSignUp || res.data.createdAt).toString().split('T')[0];
       let lastLogin=(res.data.lastLoginDate).toString().split('T')[0];
       this.lines=[
         {content:'User Since',text:firstDate},
-        {content:'Expense Logged',text:res.data.expenseLogged},
+        {content:'Expense Logged',text:res.data.expenseLogged || 0},
         {content:'Last Login',text:lastLogin},
       ];
       this.name=res.data.name;

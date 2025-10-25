@@ -32,7 +32,7 @@ export class RatingComponent {
       };
       //post feedback to DB
       this.authServ.onProvideFeedback(body).subscribe((res:any)=>{
-        if(res.status){
+        if(res.success === true || res.statusCode === 200 || res.statusCode === 201){
           this.snackBar.open('Feedback submitted successfully','',{duration:2000});
         }else{
           this.snackBar.open('Error!! Please try again','',{duration:2000});

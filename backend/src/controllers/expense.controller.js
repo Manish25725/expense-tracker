@@ -6,6 +6,9 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
 
 const createExpense = asyncHandler(async (req, res) => {
+    console.log("Creating expense - User ID:", req.user._id);
+    console.log("Request body:", req.body);
+    
     const { name, amount, expenseDate, category, paymentType, comment } = req.body
 
     if ([name, amount, category, paymentType].some((field) => field?.toString().trim() === "")) {
@@ -26,6 +29,8 @@ const createExpense = asyncHandler(async (req, res) => {
         owner: req.user._id
     })
 
+    console.log("Created expense:", expense);
+
     // Update user's expense count
     await User.findByIdAndUpdate(
         req.user._id,
@@ -40,9 +45,12 @@ const createExpense = asyncHandler(async (req, res) => {
 })
 
 const getAllExpenses = asyncHandler(async (req, res) => {
+    console.log("Getting all expenses - User ID:", req.user._id);
+    
     const { page = 1, limit = 10, category, startDate, endDate, sortBy = 'expenseDate', sortType = 'desc' } = req.query
 
     const matchConditions = { owner: req.user._id }
+    console.log("Match conditions:", matchConditions);
 
     if (category) {
         matchConditions.category = category
@@ -58,54 +66,37 @@ const getAllExpenses = asyncHandler(async (req, res) => {
         }
     }
 
-    const sortDirection = sortType === 'desc' ? -1 : 1
-    const sortOptions = { [sortBy]: sortDirection }
+    // Get expenses with proper field mapping for frontend compatibility
+    const expenses = await Expense.find(matchConditions)
+        .sort({ [sortBy]: sortType === 'desc' ? -1 : 1 })
+        .limit(parseInt(limit))
+        .skip((page - 1) * parseInt(limit))
+        .lean()
 
-    const expenses = await Expense.aggregate([
-        { $match: matchConditions },
-        { $sort: sortOptions },
-        { $skip: (page - 1) * parseInt(limit) },
-        { $limit: parseInt(limit) },
-        {
-            $lookup: {
-                from: "users",
-                localField: "owner",
-                foreignField: "_id",
-                as: "owner",
-                pipeline: [
-                    {
-                        $project: {
-                            name: 1,
-                            username: 1,
-                            email: 1
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            $addFields: {
-                owner: { $first: "$owner" }
-            }
-        }
-    ])
+    // Map backend field names to frontend expected field names
+    const mappedExpenses = expenses.map(expense => ({
+        _id: expense._id,
+        name: expense.name,
+        amount: expense.amount,
+        expense_date: expense.expenseDate.toDateString(), // Format date as readable string
+        expense_category: expense.category, // Map category to expense_category
+        payment: expense.paymentType, // Map paymentType to payment
+        comment: expense.comment,
+        owner: expense.owner,
+        createdAt: expense.createdAt,
+        updatedAt: expense.updatedAt
+    }))
+
+    console.log("Found expenses:", mappedExpenses.length);
 
     const totalExpenses = await Expense.countDocuments(matchConditions)
-    const totalAmount = await Expense.aggregate([
-        { $match: matchConditions },
-        { $group: { _id: null, total: { $sum: "$amount" } } }
-    ])
+    
+    console.log("Total expenses count:", totalExpenses);
 
     return res.status(200).json(
         new ApiResponse(
             200, 
-            {
-                expenses,
-                totalExpenses,
-                totalAmount: totalAmount[0]?.total || 0,
-                currentPage: parseInt(page),
-                totalPages: Math.ceil(totalExpenses / limit)
-            },
+            mappedExpenses, // Return mapped expenses
             "Expenses fetched successfully"
         )
     )
@@ -127,8 +118,22 @@ const getExpenseById = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Expense not found")
     }
 
+    // Map field names for frontend compatibility
+    const mappedExpense = {
+        _id: expense._id,
+        name: expense.name,
+        amount: expense.amount,
+        expense_date: expense.expenseDate.toDateString(), // Format date as readable string
+        expense_category: expense.category,
+        payment: expense.paymentType,
+        comment: expense.comment,
+        owner: expense.owner,
+        createdAt: expense.createdAt,
+        updatedAt: expense.updatedAt
+    }
+
     return res.status(200).json(
-        new ApiResponse(200, expense, "Expense fetched successfully")
+        new ApiResponse(200, mappedExpense, "Expense fetched successfully")
     )
 })
 
@@ -292,6 +297,39 @@ const importExpenses = asyncHandler(async (req, res) => {
     )
 })
 
+const getDashboardExpenses = asyncHandler(async (req, res) => {
+    const { timeFilter } = req.query
+    let dateFilter = {}
+
+    // Apply time filter if specified
+    if (timeFilter && timeFilter !== 'all') {
+        const now = new Date()
+        switch (timeFilter) {
+            case 'week':
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+                dateFilter = { expenseDate: { $gte: weekAgo } }
+                break
+            case 'month':
+                const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+                dateFilter = { expenseDate: { $gte: monthAgo } }
+                break
+            case 'year':
+                const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+                dateFilter = { expenseDate: { $gte: yearAgo } }
+                break
+        }
+    }
+
+    const expenses = await Expense.find({
+        user: req.user._id,
+        ...dateFilter
+    }).sort({ expenseDate: -1 })
+
+    return res.status(200).json(
+        new ApiResponse(200, expenses, "Dashboard expenses retrieved successfully")
+    )
+})
+
 export {
     createExpense,
     getAllExpenses,
@@ -299,5 +337,6 @@ export {
     updateExpense,
     deleteExpense,
     getExpenseStats,
-    importExpenses
+    importExpenses,
+    getDashboardExpenses
 }

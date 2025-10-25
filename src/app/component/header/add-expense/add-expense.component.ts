@@ -45,7 +45,8 @@ export class AddExpenseComponent implements OnInit {
   ngOnInit(): void {
     this.isSaving=false;
     this.businessData.onGetAllCategory().subscribe((res:any)=>{
-      this.keywords=res.data;
+      // Extract categories from user object
+      this.keywords = res.data.categories || [];
     })
     this.expenseForm = new FormGroup({
       name: new FormControl('', [Validators.required,Validators.maxLength(50),Validators.pattern('^[a-zA-Z ]*$')]),
@@ -74,8 +75,8 @@ export class AddExpenseComponent implements OnInit {
       let day = parseInt(date[2]);
       let year = parseInt(date[3]);
       this.businessData.onGetAllCategory().subscribe((response:any)=>{
-        let cate=response.data;
-        let index=response.data.indexOf(res.data.expense_category);
+        let cate=response.data.categories || [];
+        let index=cate.indexOf(res.data.expense_category);
         if(index==-1){
           this.isCategoryNotFound=true;
         }
@@ -111,7 +112,7 @@ export class AddExpenseComponent implements OnInit {
       .onCreateExpense(this.expenseForm.value, this.date)
       .subscribe((res: any) => {
         this.isSaving=false;
-        if (res.status === true) {
+        if (res.success === true || res.statusCode === 200 || res.statusCode === 201) {
           this._snackBar.open('Expense Added', '', { duration: 2000 });
           this.onReset();
         } else {
@@ -120,20 +121,29 @@ export class AddExpenseComponent implements OnInit {
           });
         }
       },(error)=>{
+        this.isSaving=false;
+        this._snackBar.open('Error occured!! Please try again', '', {
+          duration: 2000,
+        });
         this.onReset();
       });
   }
   onEdit() {
     this.businessData
       .onUpdateExpense(this.id, this.expenseForm.value)
-      .subscribe((res) => {
-        if (res) {
+      .subscribe((res: any) => {
+        if (res.success === true || res.statusCode === 200) {
           this._snackBar.open('Expense Updated', '', { duration: 2000 });
         } else {
           this._snackBar.open('Error! Please try Again', '', {
             duration: 2000,
           });
         }
+        this.route.navigate(['dashboard']);
+      }, (error) => {
+        this._snackBar.open('Error! Please try Again', '', {
+          duration: 2000,
+        });
         this.route.navigate(['dashboard']);
       });
   }

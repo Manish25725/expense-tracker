@@ -24,8 +24,7 @@ export class AddCategoryComponent implements OnInit{
     this.businesData.onGetAllCategory().subscribe((res:any)=>{
       if(res){
         this.CategoryLoad=false;
-        this.keywords=res.data;
-
+        this.keywords=res.data.categories || [];
       }
     });
   }
@@ -68,7 +67,9 @@ export class AddCategoryComponent implements OnInit{
   onSave() { //api call
     this.isSaving=true;
     this.categoryAdded.emit(this.keywords);
-    this.businesData.onCreateCategory(this.newKeywords).subscribe((res)=>{
+    // Combine existing keywords with new ones
+    const updatedCategories = [...this.keywords, ...this.newKeywords];
+    this.businesData.onCreateCategory(updatedCategories).subscribe((res)=>{
       if(res){
         this.keywords.push(...this.newKeywords);
         this.newKeywords=[];
