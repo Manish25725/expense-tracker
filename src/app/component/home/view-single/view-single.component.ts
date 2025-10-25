@@ -15,7 +15,6 @@ export class ViewSingleComponent implements OnInit{
     
   }
   ngOnInit(): void {
-    // console.log(this.tableData);
     this.onGetSingleExpense();
   }
   

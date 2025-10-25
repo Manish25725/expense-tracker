@@ -83,7 +83,6 @@ export class AuthService {
         }
       },
       (error) => {
-        // console.log(error);
         this._snackBar.open('Email Already Exist! Login Please', '', {
           duration: 5000,
         });
@@ -174,7 +173,7 @@ export class AuthService {
       createdAt:new Date(),
     };
     this.onCollectSource(body).subscribe((res:any)=>{
-      console.log(res.message);
+      // Source tracking saved
     }),(error:any)=>{
       console.error(error);
     };

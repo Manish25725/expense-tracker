@@ -62,7 +62,6 @@ export class AlertBoxComponent implements OnInit{
       this.onConfirmPasswordAndDeleteAccount();
     },error=>{
       this.isLoading=false;
-      console.log(error);
       this.snackBar.open(error.error.message,'',{duration:2000});
     })
   }

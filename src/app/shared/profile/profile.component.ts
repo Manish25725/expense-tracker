@@ -61,7 +61,7 @@ export class ProfileComponent implements OnInit{
     this.businessData.updateProfile(body).subscribe((res:any)=>{
       if(res){
         this.businessData.updateWholeInfo(body).subscribe((result)=>{
-          // console.log(result);
+          // Profile information updated
         });
         this.snackBar.open('Profile Updated','',{duration:2000});
       }
@@ -70,7 +70,6 @@ export class ProfileComponent implements OnInit{
     });
   }
   onDeleteAccount(){
-    // console.log("delete");
     this.dialog.open(AlertBoxComponent, {
       data:{type:'delete'}
     });

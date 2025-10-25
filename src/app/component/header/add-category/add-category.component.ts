@@ -45,10 +45,6 @@ export class AddCategoryComponent implements OnInit{
   }
 
   onSaveEditCategories(){
-    //isEdit true
-    //api call to update all categories
-    //also update the emit property
-    // console.log('edit log save btn');
     this.isSaving=true;
     this.businesData.onEditCategory(this.keywords).subscribe((res)=>{
       if(res){

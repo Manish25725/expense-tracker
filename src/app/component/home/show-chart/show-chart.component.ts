@@ -4,6 +4,7 @@ import { ChartConfiguration } from 'chart.js';
 import { MatDialog } from '@angular/material/dialog';
 import { BusinessDataService } from 'src/app/services/business-data.service';
 import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-show-chart',
   templateUrl: './show-chart.component.html',

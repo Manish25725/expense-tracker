@@ -43,7 +43,6 @@ export class ImportComponent implements OnInit {
 
   onSaveImport() {
     this.propertyNames=this.csvRecords[0];
-    // console.log(this.csvRecords);
     
     let hashamp:any={};
     let name:boolean=false;
@@ -133,7 +132,7 @@ export class ImportComponent implements OnInit {
       .onImportExpense(body)
       .subscribe((res: any) => {
         if (res.status === true) {
-          console.log("Added");
+          // Expense added successfully
         }
       },error=>{
         this.snackBar.open(error.message,' ',{duration:2000});
@@ -160,21 +159,6 @@ export class ImportComponent implements OnInit {
           allTextLines[i]=allTextLines[i].split(',')
         }
         this.csvRecords=allTextLines;
-        // console.log(allTextLines,headers);
       }
-
-    // this.ngxCsvParser.parse(files[0], { header: this.header, delimiter: ',', encoding: 'utf8' })
-    //   .pipe().subscribe({
-    //     next: (result): void => {
-    //       this.csvRecords = result;
-    //       console.log(this.csvRecords);
-          
-    //     },
-    //     error: (error: NgxCSVParserError): void => {
-    //       console.log('Error', error);
-    //     }
-    //   });
   }
-
-
 }
