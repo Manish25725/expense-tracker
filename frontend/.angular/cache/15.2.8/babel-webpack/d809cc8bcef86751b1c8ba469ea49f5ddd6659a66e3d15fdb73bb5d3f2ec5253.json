@@ -1,0 +1,1 @@
+{"ast":null,"code":"export const environment = {\n  production: true,\n  apiUrl: 'http://localhost:3003/',\n  adminId: '6558727029c0dacee0900c6a'\n};","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}
