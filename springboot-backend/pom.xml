@@ -22,7 +22,8 @@
         <java.version>17</java.version>
         <node.version>v18.16.0</node.version>
         <npm.version>9.5.1</npm.version>
-        <frontend.src.dir>${project.basedir}/../frontend</frontend.src.dir>
+        <!-- Points to the Angular project root (parent directory of springboot-backend) -->
+        <frontend.src.dir>${project.basedir}/..</frontend.src.dir>
         <jjwt.version>0.12.3</jjwt.version>
     </properties>
 
