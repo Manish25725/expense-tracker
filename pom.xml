@@ -169,7 +169,7 @@
                             <outputDirectory>${project.basedir}/src/main/resources/static</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${frontend.src.dir}/dist/expense-tracker</directory>
+                                    <directory>${frontend.src.dir}/dist</directory>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>
